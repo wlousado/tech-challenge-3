@@ -79,10 +79,8 @@ services:
     container_name: scheduling-ms
     networks:
       - kong-net
-    environment:
-      - PORT=3000
     ports:
-      - "3001:3000"
+      - "3001:8080"
     restart: unless-stopped
 
   # Microserviço de Notificação
@@ -92,8 +90,6 @@ services:
     container_name: notification-ms
     networks:
       - kong-net
-    environment:
-      - PORT=3000
     ports:
-      - "3002:3000"
+      - "3002:8080"
     restart: unless-stopped
