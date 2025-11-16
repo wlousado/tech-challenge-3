@@ -24,7 +24,7 @@ Cada um tem seu próprio `.git`, suas próprias branches, seus próprios commits
 ```bash
 Em uma pasta de sua preferência no seu computador:
 
-git clone git@github.com:ThiagoLeite06/med-clinic.git
+git clone git@github.com:wlousado/tech-challenge-3.git
 git clone git@github.com:ThiagoLeite06/scheduling-ms.git
 git clone git@github.com:ThiagoLeite06/notification-ms.git
 ```
