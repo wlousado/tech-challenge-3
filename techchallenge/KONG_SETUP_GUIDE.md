@@ -2,9 +2,9 @@
 
 ## Visão Geral
 
-Este projeto utiliza Kong API Gateway para gerenciar o acesso aos microserviços. Este guia explica como configurar e usar a autenticação via API Key.
+Este projeto utiliza Kong API Gateway para gerenciar o acesso aos microserviços com autenticação baseada em roles (médico/paciente).
 
-## Arquitetura Atual
+## Arquitetura
 
 ```
 ┌─────────────┐
@@ -16,7 +16,7 @@ Este projeto utiliza Kong API Gateway para gerenciar o acesso aos microserviços
 │      Kong API Gateway               │
 │  - Roteamento                       │
 │  - Autenticação (Key Auth)          │
-│  - Rate Limiting (opcional)         │
+│  - Controle de Acesso (ACL)         │
 └──────┬──────────────────────┬───────┘
        │                      │
        ▼                      ▼
@@ -32,17 +32,17 @@ Este projeto utiliza Kong API Gateway para gerenciar o acesso aos microserviços
 - **Scheduling Service**: `http://localhost:8000/scheduling`
 - **Notification Service**: `http://localhost:8000/notification`
 
-### Kong Admin API (Porta 8001)
+### Kong Admin (Porta 8001)
 - **Admin API**: `http://localhost:8001`
 
 ### Kong Admin GUI (Porta 8002)
 - **Admin GUI**: `http://localhost:8002`
 
-### Acesso Direto aos Microserviços (não recomendado em produção)
+### Acesso Direto aos Microserviços (desenvolvimento)
 - **Scheduling MS**: `http://localhost:3001/scheduling`
 - **Notification MS**: `http://localhost:3002/notification`
 
-## Configuração Atual do Kong
+## Configuração Atual
 
 ### Services
 | Nome | Host | Port | Path |
@@ -56,168 +56,151 @@ Este projeto utiliza Kong API Gateway para gerenciar o acesso aos microserviços
 | scheduling-route | /scheduling | false | scheduling-service |
 | notification-route | /notification | false | notification-service |
 
-## Configurando Autenticação
+### Controle de Acesso (ACL)
 
-### Passo 1: Executar o Script de Configuração
+| Role | /scheduling | /notification |
+|------|-------------|---------------|
+| **médico** | ✅ Permitido | ✅ Permitido |
+| **paciente** | ❌ Bloqueado | ✅ Permitido |
 
-Execute o script de configuração automática:
+## Configurando o Projeto
+
+### 1. Subir os Serviços
+
+```bash
+docker compose up -d
+```
+
+Aguarde ~30 segundos para todos os serviços iniciarem.
+
+### 2. Configurar Autenticação
 
 ```bash
 cd techchallenge
-./kong-auth-setup.sh
+./kong-auth-acl-setup.sh
 ```
 
 Este script irá:
-1. Habilitar o plugin Key Auth nos serviços
-2. Criar 3 consumers (usuários): admin, mobile-app, web-app
-3. Gerar API Keys para cada consumer
-4. Exibir as chaves geradas
+1. ✅ Habilitar plugins Key Auth e ACL
+2. ✅ Criar usuários de teste (Dr. João, Dra. Ana, Maria)
+3. ✅ Definir roles (médico/paciente)
+4. ✅ Gerar API Keys
+5. ✅ Executar testes de validação
 
-### Passo 2: Testar Sem Autenticação (Deve Falhar)
-
-Após executar o script, tentativas sem API Key retornarão erro 401:
+### 3. Testar
 
 ```bash
-curl http://localhost:8000/scheduling
-# Retorna: {"message":"No API key found in request"}
+# Médico acessando scheduling
+curl -H "apikey: medico-drjoao-key-123" http://localhost:8000/scheduling
+
+# Paciente tentando acessar scheduling (será bloqueado)
+curl -H "apikey: paciente-maria-key-789" http://localhost:8000/scheduling
 ```
 
-### Passo 3: Testar Com Autenticação (Deve Funcionar)
+## Usuários de Teste
 
-Use o header `apikey` com uma das chaves geradas:
+| Usuário | Role | API Key | Permissões |
+|---------|------|---------|------------|
+| Dr. João | médico | `medico-drjoao-key-123` | `/scheduling`, `/notification` |
+| Dra. Ana | médico | `medico-draana-key-456` | `/scheduling`, `/notification` |
+| Maria | paciente | `paciente-maria-key-789` | `/notification` (apenas) |
+
+## Exemplos de Uso
+
+### Acessar como Médico
 
 ```bash
-# Usando a chave do admin
-curl -H "apikey: admin-api-key-12345" http://localhost:8000/scheduling
+# Scheduling
+curl -H "apikey: medico-drjoao-key-123" http://localhost:8000/scheduling
 
-# Usando a chave do mobile-app
-curl -H "apikey: mobile-api-key-67890" http://localhost:8000/notification
+# Notification
+curl -H "apikey: medico-drjoao-key-123" http://localhost:8000/notification
 ```
 
-## Gerenciamento de API Keys
-
-### Listar todos os Consumers
+### Acessar como Paciente
 
 ```bash
-curl http://localhost:8001/consumers | jq '.data[] | {username: .username, custom_id: .custom_id}'
+# Notification (permitido)
+curl -H "apikey: paciente-maria-key-789" http://localhost:8000/notification
+
+# Scheduling (bloqueado - retorna 403)
+curl -H "apikey: paciente-maria-key-789" http://localhost:8000/scheduling
 ```
 
-### Criar Novo Consumer
+## Gerenciamento de Usuários
+
+### Criar Novo Médico
 
 ```bash
+# 1. Criar consumer
 curl -X POST http://localhost:8001/consumers \
-  --data "username=novo-usuario" \
-  --data "custom_id=novo-usuario-001"
+  --data "username=dr.pedro"
+
+# 2. Adicionar ao grupo 'medico'
+curl -X POST http://localhost:8001/consumers/dr.pedro/acls \
+  --data "group=medico"
+
+# 3. Gerar API key
+curl -X POST http://localhost:8001/consumers/dr.pedro/key-auth
 ```
 
-### Gerar API Key para Consumer
+### Criar Novo Paciente
 
-**Chave Automática (Kong gera):**
 ```bash
-curl -X POST http://localhost:8001/consumers/novo-usuario/key-auth
+# 1. Criar consumer
+curl -X POST http://localhost:8001/consumers \
+  --data "username=joao.silva"
+
+# 2. Adicionar ao grupo 'paciente'
+curl -X POST http://localhost:8001/consumers/joao.silva/acls \
+  --data "group=paciente"
+
+# 3. Gerar API key
+curl -X POST http://localhost:8001/consumers/joao.silva/key-auth
 ```
 
-**Chave Customizada:**
+### Listar Usuários
+
 ```bash
-curl -X POST http://localhost:8001/consumers/novo-usuario/key-auth \
-  --data "key=minha-chave-secreta-12345"
+curl http://localhost:8001/consumers | jq '.data[] | {username: .username}'
 ```
 
-### Listar API Keys de um Consumer
+### Verificar Role de um Usuário
 
 ```bash
-curl http://localhost:8001/consumers/admin/key-auth
-```
-
-### Revogar API Key
-
-```bash
-# Primeiro, obtenha o ID da chave
-curl http://localhost:8001/consumers/admin/key-auth
-
-# Depois delete usando o ID
-curl -X DELETE http://localhost:8001/consumers/admin/key-auth/{KEY_ID}
-```
-
-## Outros Plugins Úteis
-
-### Rate Limiting
-
-Limite o número de requisições por consumidor:
-
-```bash
-# Limitar a 100 requisições por minuto
-curl -X POST http://localhost:8001/services/scheduling-service/plugins \
-  --data "name=rate-limiting" \
-  --data "config.minute=100" \
-  --data "config.policy=local"
-```
-
-### CORS (Cross-Origin Resource Sharing)
-
-Habilitar CORS para chamadas de browsers:
-
-```bash
-curl -X POST http://localhost:8001/services/scheduling-service/plugins \
-  --data "name=cors" \
-  --data "config.origins=*" \
-  --data "config.methods=GET,POST,PUT,DELETE" \
-  --data "config.headers=Accept,Content-Type,apikey"
-```
-
-### Request Transformer
-
-Adicionar headers automáticos nas requisições:
-
-```bash
-curl -X POST http://localhost:8001/services/scheduling-service/plugins \
-  --data "name=request-transformer" \
-  --data "config.add.headers=X-Service-Type:Scheduling"
-```
-
-### Logging (File Log)
-
-Registrar todas as requisições em arquivo:
-
-```bash
-curl -X POST http://localhost:8001/services/scheduling-service/plugins \
-  --data "name=file-log" \
-  --data "config.path=/tmp/kong-scheduling.log"
-```
-
-## Remover Autenticação
-
-Se precisar remover a autenticação:
-
-```bash
-# Listar plugins do serviço
-curl http://localhost:8001/services/scheduling-service/plugins
-
-# Deletar o plugin key-auth usando o ID
-curl -X DELETE http://localhost:8001/plugins/{PLUGIN_ID}
+curl http://localhost:8001/consumers/dr.joao/acls | jq '.data[] | .group'
 ```
 
 ## Troubleshooting
 
-### 1. Erro: "No API key found in request"
+### Erro: "No API key found in request"
 
-**Causa**: O plugin Key Auth está ativo mas você não enviou a API key.
+**Causa**: Header `apikey` não foi enviado.
 
-**Solução**: Adicione o header `apikey` na requisição:
+**Solução**:
 ```bash
 curl -H "apikey: sua-chave-aqui" http://localhost:8000/scheduling
 ```
 
-### 2. Erro: "Invalid authentication credentials"
+### Erro: "Invalid authentication credentials"
 
-**Causa**: A API key enviada não existe ou está incorreta.
+**Causa**: API key incorreta ou não existe.
 
-**Solução**: Verifique suas chaves:
+**Solução**: Verifique as keys disponíveis:
 ```bash
-curl http://localhost:8001/key-auths
+curl http://localhost:8001/key-auths | jq '.data[] | {key: .key, consumer: .consumer.username}'
 ```
 
-### 3. Kong não responde
+### Erro: "You cannot consume this service"
+
+**Causa**: Usuário não tem permissão (role incorreta).
+
+**Solução**: Verifique a role:
+```bash
+curl http://localhost:8001/consumers/maria.paciente/acls | jq '.data[] | .group'
+```
+
+### Kong não responde
 
 **Causa**: Containers podem estar parados.
 
@@ -227,103 +210,46 @@ docker compose ps
 docker compose up -d
 ```
 
-### 4. Serviço retorna 404
+### Serviço retorna 404
 
-**Causa**: Route ou controller não configurado corretamente.
+**Causa**: Endpoint não existe no microserviço.
 
-**Solução**: Verifique a configuração:
+**Solução**: Teste o acesso direto:
 ```bash
-# Verificar routes
-curl http://localhost:8001/routes | jq '.data[] | {name: .name, paths: .paths}'
-
-# Testar acesso direto ao microserviço
 curl http://localhost:3001/scheduling
+curl http://localhost:3002/notification
 ```
 
-## Boas Práticas
+## Comandos Úteis
 
-### Segurança
+```bash
+# Ver logs do Kong
+docker logs kong
 
-1. **Nunca** exponha a porta do Kong Admin API (8001) publicamente
-2. **Sempre** use HTTPS em produção (configurar certificados SSL)
-3. **Rotacione** API keys periodicamente
-4. **Use** diferentes keys para diferentes ambientes (dev, staging, prod)
-5. **Monitore** tentativas de acesso não autorizado
+# Ver logs dos microserviços
+docker logs scheduling-ms
+docker logs notification-ms
 
-### Performance
+# Reiniciar serviços
+docker compose restart
 
-1. Configure **rate limiting** para evitar abuso
-2. Use **caching** para endpoints que não mudam frequentemente
-3. Configure **timeout** adequado para os upstreams
-4. Monitore métricas do Kong
+# Parar tudo
+docker compose down
 
-### Monitoramento
-
-1. Use plugins de logging (file-log, syslog, http-log)
-2. Integre com ferramentas de APM (Datadog, New Relic)
-3. Configure alertas para erros 5xx e alta latência
-
-## Exemplo de Uso em Aplicação
-
-### JavaScript/Node.js
-
-```javascript
-const axios = require('axios');
-
-const API_KEY = 'admin-api-key-12345';
-const BASE_URL = 'http://localhost:8000';
-
-async function getScheduling() {
-  const response = await axios.get(`${BASE_URL}/scheduling`, {
-    headers: {
-      'apikey': API_KEY
-    }
-  });
-  return response.data;
-}
+# Parar e remover dados
+docker compose down -v
 ```
 
-### Python
+## Documentação Adicional
 
-```python
-import requests
+Para informações detalhadas sobre autenticação, exemplos de código e gerenciamento avançado, consulte:
 
-API_KEY = 'admin-api-key-12345'
-BASE_URL = 'http://localhost:8000'
-
-def get_scheduling():
-    headers = {'apikey': API_KEY}
-    response = requests.get(f'{BASE_URL}/scheduling', headers=headers)
-    return response.text
-```
-
-### Java
-
-```java
-import java.net.http.*;
-import java.net.URI;
-
-public class KongClient {
-    private static final String API_KEY = "admin-api-key-12345";
-    private static final String BASE_URL = "http://localhost:8000";
-
-    public String getScheduling() throws Exception {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(BASE_URL + "/scheduling"))
-            .header("apikey", API_KEY)
-            .GET()
-            .build();
-
-        HttpResponse<String> response =
-            client.send(request, HttpResponse.BodyHandlers.ofString());
-        return response.body();
-    }
-}
-```
+- **[AUTHENTICATION_GUIDE.md](AUTHENTICATION_GUIDE.md)** - Guia completo de autenticação com ACL
+- **[README.md](README.md)** - Guia rápido do projeto
 
 ## Referências
 
 - [Kong Gateway Documentation](https://docs.konghq.com/gateway/latest/)
 - [Key Auth Plugin](https://docs.konghq.com/hub/kong-inc/key-auth/)
+- [ACL Plugin](https://docs.konghq.com/hub/kong-inc/acl/)
 - [Kong Admin API](https://docs.konghq.com/gateway/latest/admin-api/)
