@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/schedulings")
-public class SchedulingControluer {
+@RequestMapping("/scheduling")
+public class SchedulingController {
 
     @GetMapping
     public String get() {
