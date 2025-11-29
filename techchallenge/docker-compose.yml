@@ -75,7 +75,8 @@ services:
   # Microserviço de Agendamento
   scheduling-ms:
     build:
-      context: ../scheduling-ms
+      context: .
+      dockerfile: ./scheduling-ms/Dockerfile
     container_name: scheduling-ms
     networks:
       - kong-net
@@ -86,7 +87,8 @@ services:
   # Microserviço de Notificação
   notification-ms:
     build:
-      context: ../notification-ms
+      context: .
+      dockerfile: ./notification-ms/Dockerfile
     container_name: notification-ms
     networks:
       - kong-net
