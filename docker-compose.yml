@@ -109,7 +109,8 @@ services:
   scheduling-ms:
     build:
       dockerfile: Dockerfile
-      target: scheduling-ms
+      args:
+        SERVICE: scheduling-ms
     container_name: scheduling-ms
     networks:
       - kong-net
@@ -130,7 +131,8 @@ services:
   notification-ms:
     build:
       dockerfile: Dockerfile
-      target: notification-ms
+      args:
+        SERVICE: notification-ms
     container_name: notification-ms
     networks:
       - kong-net
