@@ -115,7 +115,11 @@ services:
       - kong-net
     ports:
       - "3001:8080"
+    #  - "3001-3002:8080"
     restart: unless-stopped
+    #deploy:
+    #  mode: replicated
+    #  replicas: 2
     depends_on:
       kafka:
         condition: service_healthy
@@ -131,7 +135,7 @@ services:
     networks:
       - kong-net
     ports:
-      - "3002:8080"
+      - "3003:8080"
     restart: unless-stopped
     depends_on:
       kafka:
