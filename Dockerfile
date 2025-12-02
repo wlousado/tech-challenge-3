@@ -2,11 +2,7 @@ FROM maven:3.9.11-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
-COPY techchallenge/pom.xml .
-
-COPY techchallenge/core ./core
-COPY techchallenge/notification-ms ./notification-ms
-COPY techchallenge/scheduling-ms ./scheduling-ms
+COPY ./techchallenge/ .
 
 RUN mvn dependency:go-offline -B
 
