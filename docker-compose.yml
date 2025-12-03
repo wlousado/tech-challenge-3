@@ -3,8 +3,41 @@ networks:
 
 volumes:
   kong-data:
+  kafka-data:
 
 services:
+  # Broker de mensageria
+  kafka:
+    image: apache/kafka:4.1.1
+    container_name: kafka
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --list > /dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    ports:
+    - 9092:9092
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+    volumes:
+      - ./kafka-data:/var/lib/kafka/data
+
+  kafka-create-topics:
+    image: apache/kafka:4.1.1
+    container_name: init-kafka-topics
+    depends_on:
+      kafka:
+        condition: service_healthy
+    command: /opt/kafka/bin/kafka-topics.sh --create --topic meu-topico-1 --partitions 3 --bootstrap-server kafka:9092
+    restart: no
+
   # Banco de dados
   postgres:
     image: postgres:15-alpine
@@ -75,21 +108,37 @@ services:
   # Microserviço de Agendamento
   scheduling-ms:
     build:
-      context: ../scheduling-ms
+      dockerfile: Dockerfile
+      args:
+        SERVICE: scheduling-ms
     container_name: scheduling-ms
     networks:
       - kong-net
     ports:
       - "3001:8080"
+    #  - "3001-3002:8080"
     restart: unless-stopped
+    #deploy:
+    #  mode: replicated
+    #  replicas: 2
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
 
   # Microserviço de Notificação
   notification-ms:
     build:
-      context: ../notification-ms
+      dockerfile: Dockerfile
+      args:
+        SERVICE: notification-ms
     container_name: notification-ms
     networks:
       - kong-net
     ports:
-      - "3002:8080"
+      - "3003:8080"
     restart: unless-stopped
+    depends_on:
+      kafka:
+          condition: service_healthy
