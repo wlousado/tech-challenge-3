@@ -86,7 +86,7 @@ curl -H "apikey: paciente-maria-key-789" http://localhost:8000/scheduling
 
 - **[AUTHENTICATION_GUIDE.md](AUTHENTICATION_GUIDE.md)** - Guia completo de autenticação com exemplos de código
 - **[KONG_SETUP_GUIDE.md](KONG_SETUP_GUIDE.md)** - Configuração avançada do Kong
-- **[kong-auth-acl-setup.sh](kong-auth-acl-setup.sh)** - Script de configuração automática
+- **[kong-auth-acl-setup.sh](techchallenge/kong-auth-acl-setup.sh)** - Script de configuração automática
 
 ## 💻 Exemplos de Uso
 
