@@ -35,7 +35,7 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-    command: /opt/kafka/bin/kafka-topics.sh --create --topic meu-topico-1 --partitions 3 --bootstrap-server kafka:9092
+    command: /opt/kafka/bin/kafka-topics.sh --create --topic notification-v1 --partitions 3 --bootstrap-server kafka:9092
     restart: no
 
   # Banco de dados
@@ -106,12 +106,12 @@ services:
       retries: 5
 
   # Microserviço de Agendamento
-  scheduling-ms:
+  appointment-ms:
     build:
       dockerfile: Dockerfile
       args:
-        SERVICE: scheduling-ms
-    container_name: scheduling-ms
+        SERVICE: appointment-ms
+    container_name: appointment-ms
     networks:
       - kong-net
     ports:
