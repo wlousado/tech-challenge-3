@@ -1,16 +1,13 @@
-package com.fiap.schedulingms.core.domain;
+package com.fiap.appointmentms.core.domain;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-
-import com.fiap.core.domain.User;
-
 
 public record Appointment(
         Long id,
         User patient,
         User doctor,
-        User nurse,
+        User registeredBy,
         LocalDate dateOfAppointment,
         LocalTime timeOfAppointment) {
 
