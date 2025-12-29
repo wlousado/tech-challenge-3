@@ -1,0 +1,29 @@
+spring:
+  kafka:
+    topic:
+      name: "consultas-agendadas"
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: my-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: "*"
+        spring.json.value.default.type: br.com.notification_ms.domain.model.ConsultaDto
+        spring.json.use.type.headers: false
+      enable-auto-commit: false
+    listener:
+      ack-mode: manual
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: #criar novo email
+    password: #gerar nova senha de aplicativo
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
