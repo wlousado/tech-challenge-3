@@ -28,4 +28,9 @@ public class UserSpringGateway implements UserGateway {
         var entity = UserPresenter.toEntity(doc);
         userRepository.save(entity);
     }
+
+    @Override
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id).map(UserPresenter::mapEntity);
+    }
 }

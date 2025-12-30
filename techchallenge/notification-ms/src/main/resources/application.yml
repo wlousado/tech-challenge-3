@@ -1,10 +1,10 @@
 spring:
   kafka:
     topic:
-      name: "consultas-agendadas"
+      name: "appointments-events"
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
-      group-id: my-group
+      group-id: appointment-notification-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer

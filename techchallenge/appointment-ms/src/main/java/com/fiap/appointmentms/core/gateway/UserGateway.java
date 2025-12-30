@@ -9,4 +9,6 @@ public interface  UserGateway {
     Optional<User> findByLogin(String login);
 
     void save(User doc);
+
+    Optional<User> findById(Long id);
 }

@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "user_appointment")
@@ -32,6 +33,8 @@ public class UserEntity {
     private UserTypeEnum userType;
 
     public UserEntity(User doc) {
+        if(!Objects.isNull(doc.id()))
+            this.id = doc.id();
         this.name = doc.name();
         this.email = doc.email();
         this.login = doc.login();
@@ -39,6 +42,5 @@ public class UserEntity {
         this.userType = doc.type();
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-
     }
 }

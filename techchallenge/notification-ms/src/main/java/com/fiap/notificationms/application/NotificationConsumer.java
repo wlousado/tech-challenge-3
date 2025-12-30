@@ -1,6 +1,6 @@
 package com.fiap.notificationms.application;
 
-import com.fiap.core.dto.ConsultaDto;
+import com.fiap.core.message.AppointmentMessage;
 import com.fiap.notificationms.domain.usecase.NotificationUsecase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,7 @@ public class NotificationConsumer {
     }
 
     @KafkaListener(topics = "${spring.kafka.topic.name}", groupId = "${spring.kafka.consumer.group-id}")
-    public void consume(ConsultaDto consulta, Acknowledgment acknowledgment) {
+    public void consume(AppointmentMessage consulta, Acknowledgment acknowledgment) {
         log.info("Recebida a consulta para notificação: {}", consulta);
         try {
             notificationUsecase.execute(consulta);
