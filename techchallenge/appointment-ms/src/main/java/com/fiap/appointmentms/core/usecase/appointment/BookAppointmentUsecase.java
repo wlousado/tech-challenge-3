@@ -2,11 +2,11 @@ package com.fiap.appointmentms.core.usecase.appointment;
 
 import com.fiap.appointmentms.core.domain.Appointment;
 import com.fiap.appointmentms.core.domain.User;
-import com.fiap.appointmentms.core.gateway.NotificationGateway;
+import com.fiap.appointmentms.core.gateway.AppointmentGateway;
+import com.fiap.appointmentms.core.gateway.AppointmentEventSourcingGateway;
 import com.fiap.appointmentms.core.gateway.UserGateway;
 import com.fiap.appointmentms.core.presenter.AppointmentMessagePresenter;
 import com.fiap.appointmentms.core.presenter.AppointmentPresenter;
-import com.fiap.core.enums.UserTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +16,14 @@ import java.time.LocalDateTime;
 @Slf4j
 public class BookAppointmentUsecase {
 
+    private final AppointmentGateway appointmentGateway;
     private final UserGateway userGateway;
-    private final NotificationGateway notificationGateway;
+    private final AppointmentEventSourcingGateway appointmentEventSourcingGateway;
 
-    public BookAppointmentUsecase(UserGateway userGateway, NotificationGateway notificationGateway) {
+    public BookAppointmentUsecase(AppointmentGateway appointmentGateway, UserGateway userGateway, AppointmentEventSourcingGateway appointmentEventSourcingGateway) {
+        this.appointmentGateway = appointmentGateway;
         this.userGateway = userGateway;
-        this.notificationGateway = notificationGateway;
+        this.appointmentEventSourcingGateway = appointmentEventSourcingGateway;
     }
 
     public void execute(Appointment appointment) {
@@ -32,15 +34,10 @@ public class BookAppointmentUsecase {
             throw new IllegalArgumentException("Data de agendamento deve ser maior que a data atual");
         }
 
-        var registeredBy = userGateway.findById(appointment.registeredBy().id())
+        var registeredBy = userGateway.findByLogin(appointment.registeredBy().login())
                 .orElseThrow();
         var patient = userGateway.findById(appointment.patient().id())
                 .orElseThrow();
-
-        if(!registeredBy.type().equals(UserTypeEnum.DOCTOR) && !registeredBy.type().equals(UserTypeEnum.NURSE)) {
-            log.error("Usuario sem permissao para realizar agendamento");
-            throw new IllegalArgumentException("Usuario sem permissao para realizar agendamento");
-        }
 
         if(registeredBy.id().equals(appointment.doctor().id())) {
             doctor = registeredBy;
@@ -50,7 +47,8 @@ public class BookAppointmentUsecase {
         }
 
         var register = AppointmentPresenter.toDomain(appointment, doctor, registeredBy, patient);
-        var appointmentRegistred = AppointmentMessagePresenter.toMessage(register);
-        notificationGateway.registerAppointment(appointmentRegistred);
+        var saved = appointmentGateway.save(register);
+        var appointmentRegistered = AppointmentMessagePresenter.toMessage(saved);
+        appointmentEventSourcingGateway.registerAppointment(appointmentRegistered);
     }
 }

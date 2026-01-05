@@ -1,6 +1,6 @@
 package com.fiap.core.message;
 
-public record CorrectionAppointmentMessage(
+public record AppointmentCorrectionMessage(
         Long idAppointment,
         String correctedObservation,
         String justification

@@ -28,6 +28,9 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
     volumes:
       - ./kafka-data:/var/lib/kafka/data
   kafka-create-topics:
@@ -65,6 +68,16 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+  appointment-db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: toor
+      MYSQL_DATABASE: appointmentdb
+      MYSQL_USER: appointment
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
   kong-migration:
     image: kong:3.7
     container_name: kong-migration

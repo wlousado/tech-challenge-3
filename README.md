@@ -12,11 +12,6 @@ docker compose up -d
 
 Aguarde ~30 segundos para todos os serviços iniciarem.
 
-### 2. Configurar Autenticação
-
-```bash
-./kong-auth-acl-setup.sh
-```
 
 ### 3. Testar
 
