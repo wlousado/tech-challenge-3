@@ -1,10 +1,12 @@
 networks:
   kong-net:
   kafka-net:
+  mysql-net:
 
 volumes:
   kong-data:
   kafka-data:
+  mysql-data:
 
 services:
   # Broker de mensageria
@@ -37,7 +39,7 @@ services:
     networks:
       - kafka-net
     volumes:
-      - ./kafka-data:/var/lib/kafka/data
+      - kafka-data:/var/lib/kafka/data
   kafka-create-topics:
     image: apache/kafka:4.1.1
     container_name: init-kafka-topics
@@ -85,6 +87,10 @@ services:
       MYSQL_DATABASE: appointmentdb
       MYSQL_USER: appointment
       MYSQL_PASSWORD: password
+    networks:
+      - mysql-net
+    volumes:
+      - mysql-data:/var/lib/mysql
     ports:
       - "3306:3306"
   kong-migration:
@@ -141,6 +147,7 @@ services:
     networks:
       - kong-net
       - kafka-net
+      - mysql-net
     ports:
       - "3001:8080"
     restart: unless-stopped
@@ -161,6 +168,8 @@ services:
     ports:
       - "3003:8080"
     restart: unless-stopped
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
     depends_on:
       kafka:
           condition: service_healthy
