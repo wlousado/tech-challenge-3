@@ -71,6 +71,8 @@ services:
   appointment-db:
     image: mysql:8.0
     restart: always
+    networks:
+      - kong-net
     environment:
       MYSQL_ROOT_PASSWORD: toor
       MYSQL_DATABASE: appointmentdb

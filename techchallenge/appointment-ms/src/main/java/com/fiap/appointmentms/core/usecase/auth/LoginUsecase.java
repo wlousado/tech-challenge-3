@@ -20,14 +20,32 @@ public class LoginUsecase {
     }
 
     public String execute(String login, String password){
-        var userByLogin = userGateway.findByLogin(login);
-        if(userByLogin.isPresent()){
-            var usuarioDomain = userByLogin.get();
-            if(!encryptGateway.validate(password, usuarioDomain.password())){
-                throw new AuthLoginError("Senha invalida");
+        try {
+            var userByLogin = userGateway.findByLogin(login);
+            if(userByLogin.isPresent()){
+                var usuarioDomain = userByLogin.get();
+                if(!encryptGateway.validate(password, usuarioDomain.password())){
+                    throw new AuthLoginError("Senha invalida");
+                }
+                return tokenGateway.generate(usuarioDomain);
             }
-            return tokenGateway.generate(usuarioDomain);
+            throw new AuthLoginError("Login {} falhou".replace("{}", login));
+        } catch (Exception e) {
+            System.err.println("Login error: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
-        throw new AuthLoginError("Login {} falhou".replace("{}", login));
+    }
+
+    public String testDbConnection() {
+        try {
+            var userByLogin = userGateway.findByLogin("doctor");
+            if(userByLogin.isPresent()) {
+                return userByLogin.get().name();
+            }
+            return "User not found";
+        } catch (Exception e) {
+            throw new RuntimeException("DB Connection failed: " + e.getMessage(), e);
+        }
     }
 }

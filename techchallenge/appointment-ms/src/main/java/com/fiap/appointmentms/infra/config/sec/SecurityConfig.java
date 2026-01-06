@@ -29,28 +29,19 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) {
-        http
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
-                .authorizeHttpRequests(authz ->
-                        authz
-                                .requestMatchers(HttpMethod.OPTIONS).permitAll()
-                                .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
-                                .requestMatchers("/h2-console/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/v1/auth/**").permitAll()
-                                .anyRequest().authenticated()
-                )
-                .addFilterBefore(tokenInterceptorFilter, UsernamePasswordAuthenticationFilter.class)
-                .authenticationProvider(authenticationProvider)
-                .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        return http.build();
+                .authorizeHttpRequests(authz -> authz.anyRequest().permitAll())
+                .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .build();
     }
 
 }
