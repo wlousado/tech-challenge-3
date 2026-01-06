@@ -21,10 +21,13 @@ public class CompletedAppoiintmentUsecase {
     public void execute(Long idAppointment){
         var appointment = appointmentGateway.findById(idAppointment);
         if(appointment.isPresent()){
-            var toComplete = AppointmentPresenter.toDomain(appointment.get(), AppointmentEventEnum.COMPLETED_APPOINTMENT);
-            appointmentGateway.update(toComplete);
-            var message = AppointmentMessagePresenter.toMessage(idAppointment);
-            appointmentEventSourcingGateway.completeAppointment(message);
+            var paramAppointment = appointment.get();
+            if(!paramAppointment.event().equals(AppointmentEventEnum.COMPLETED_APPOINTMENT) && !paramAppointment.event().equals(AppointmentEventEnum.CANCELLED_APPOINTMENT)){
+                var toComplete = AppointmentPresenter.toDomain(appointment.get(), AppointmentEventEnum.COMPLETED_APPOINTMENT);
+                appointmentGateway.update(toComplete);
+                var message = AppointmentMessagePresenter.toMessage(idAppointment);
+                appointmentEventSourcingGateway.completeAppointment(message);
+            } else throw new IllegalStateException("Appointment already finished");
         } else throw new IllegalStateException("Appointment not found");
     }
 }

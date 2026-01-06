@@ -29,6 +29,7 @@ public class AppointmentConsumerSpringGateway implements AppointmentEventListner
         this.appointmentTimelineGateway = appointmentTimelineGateway;
     }
 
+    @Override
     @KafkaHandler
     public void doOnRegisterAppointment(AppointmentRegisterMessage message) {
         log.info("Registering appointment: {}", message);
@@ -40,6 +41,7 @@ public class AppointmentConsumerSpringGateway implements AppointmentEventListner
     }
 
     @Override
+    @KafkaHandler
     public void doOnUpdateAppointment(AppointmentUpdateMessage message) {
         log.info("Updating appointment: {}", message);
         AppointmentTimeline appointmentTimelineDomain = AppointmentTimelinePresenter.toDomain(message);
@@ -50,17 +52,35 @@ public class AppointmentConsumerSpringGateway implements AppointmentEventListner
     }
 
     @Override
+    @KafkaHandler
     public void doOnCorrectionAppointment(AppointmentCorrectionMessage message) {
+        log.info("Correcting appointment: {}", message);
+        AppointmentTimeline appointmentTimeline = AppointmentTimelinePresenter.toDomain(message);
+        appointmentTimelineGateway.save(appointmentTimeline);
 
+        AppointmentView appointmentView = AppointmentViewPresenter.toDomain(message, LocalDateTime.now());
+        appointmentViewGateway.update(appointmentView);
     }
 
     @Override
+    @KafkaHandler
     public void doOnCancelAppointment(AppointmentCancelledMessage message) {
+        log.info("Cancel appointment: {}", message);
+        AppointmentTimeline appointmentTimeline = AppointmentTimelinePresenter.toDomain(message);
+        appointmentTimelineGateway.save(appointmentTimeline);
 
+        AppointmentView appointmentView = AppointmentViewPresenter.toDomain(message, LocalDateTime.now());
+        appointmentViewGateway.update(appointmentView);
     }
 
     @Override
+    @KafkaHandler
     public void doOnCompleteAppointment(AppointmentCompletedMessage message) {
+        log.info("Complete appointment: {}", message);
+        AppointmentTimeline appointmentTimeline = AppointmentTimelinePresenter.toDomain(message);
+        appointmentTimelineGateway.save(appointmentTimeline);
 
+        AppointmentView appointmentView = AppointmentViewPresenter.toDomain(message, LocalDateTime.now());
+        appointmentViewGateway.update(appointmentView);
     }
 }

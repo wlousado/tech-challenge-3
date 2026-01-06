@@ -44,16 +44,28 @@ public class AppointmentProducerSpringGateway implements AppointmentEventSourcin
 
     @Override
     public void correctionAppointment(AppointmentCorrectionMessage message) {
-
+        var appointmentId = message.idAppointment();
+        var serializedAppointment = serializerGateway.serialize(message);
+        var dateOfChange = LocalDateTime.now();
+        appointmentHistoryGateway.save(AppointmentHistoryPresenter.toDomain(message, serializedAppointment, dateOfChange));
+        kafka.send(TOPIC, String.valueOf(appointmentId), message);
     }
 
     @Override
     public void cancelAppointment(AppointmentCancelledMessage message) {
-
+        var appointmentId = message.idAppointment();
+        var serializedAppointment = serializerGateway.serialize(message);
+        var dateOfChange = LocalDateTime.now();
+        appointmentHistoryGateway.save(AppointmentHistoryPresenter.toDomain(message, serializedAppointment, dateOfChange));
+        kafka.send(TOPIC, String.valueOf(appointmentId), message);
     }
 
     @Override
     public void completeAppointment(AppointmentCompletedMessage message) {
-
+        var appointmentId = message.idAppointment();
+        var serializedAppointment = serializerGateway.serialize(message);
+        var dateOfChange = LocalDateTime.now();
+        appointmentHistoryGateway.save(AppointmentHistoryPresenter.toDomain(message, serializedAppointment, dateOfChange));
+        kafka.send(TOPIC, String.valueOf(appointmentId), message);
     }
 }

@@ -22,10 +22,13 @@ public class CancelledAppointmentUsecase {
     public void execute(AppointmentCancelled appointmentCancelled){
         var appointment = appointmentGateway.findById(appointmentCancelled.idAppointment());
         if(appointment.isPresent()){
-            var toCancell = AppointmentPresenter.toDomain(appointment.get(), AppointmentEventEnum.CANCELLED_APPOINTMENT);
-            appointmentGateway.update(toCancell);
-            var message = AppointmentMessagePresenter.toMessage(appointmentCancelled);
-            appointmentEventSourcingGateway.cancelAppointment(message);
+            var paramAppointment = appointment.get();
+            if(!paramAppointment.event().equals(AppointmentEventEnum.COMPLETED_APPOINTMENT) && !paramAppointment.event().equals(AppointmentEventEnum.CANCELLED_APPOINTMENT)){
+                var toCancell = AppointmentPresenter.toDomain(appointment.get(), AppointmentEventEnum.CANCELLED_APPOINTMENT);
+                appointmentGateway.update(toCancell);
+                var message = AppointmentMessagePresenter.toMessage(appointmentCancelled);
+                appointmentEventSourcingGateway.cancelAppointment(message);
+            } else throw new IllegalStateException("Appointment already finished");
         } else throw new IllegalStateException("Appointment not found");
     }
 }

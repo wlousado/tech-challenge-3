@@ -3,8 +3,7 @@ package com.fiap.appointmentms.infra.presenter;
 import com.fiap.appointmentms.core.domain.AppointmentHistory;
 import com.fiap.appointmentms.infra.gateway.spring.data.entity.AppointmentHistoryEntity;
 import com.fiap.core.enums.AppointmentEventEnum;
-import com.fiap.core.message.AppointmentUpdateMessage;
-import com.fiap.core.message.AppointmentRegisterMessage;
+import com.fiap.core.message.*;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -46,6 +45,33 @@ public class AppointmentHistoryPresenter {
         return AppointmentHistory.builder()
                 .idAppointment(message.idAppointment())
                 .event(AppointmentEventEnum.UPDATED_APPOINTMENT)
+                .dateTimeOfChange(dateOfChange)
+                .detail(serializedAppointment)
+                .build();
+    }
+
+    public static AppointmentHistory toDomain(AppointmentCorrectionMessage message, String serializedAppointment, LocalDateTime dateOfChange) {
+        return AppointmentHistory.builder()
+                .idAppointment(message.idAppointment())
+                .event(AppointmentEventEnum.CORRECTED_APPOINTMENT)
+                .dateTimeOfChange(dateOfChange)
+                .detail(serializedAppointment)
+                .build();
+    }
+
+    public static AppointmentHistory toDomain(AppointmentCancelledMessage message, String serializedAppointment, LocalDateTime dateOfChange) {
+        return AppointmentHistory.builder()
+                .idAppointment(message.idAppointment())
+                .event(AppointmentEventEnum.CANCELLED_APPOINTMENT)
+                .dateTimeOfChange(dateOfChange)
+                .detail(serializedAppointment)
+                .build();
+    }
+
+    public static AppointmentHistory toDomain(AppointmentCompletedMessage message, String serializedAppointment, LocalDateTime dateOfChange) {
+        return AppointmentHistory.builder()
+                .idAppointment(message.idAppointment())
+                .event(AppointmentEventEnum.COMPLETED_APPOINTMENT)
                 .dateTimeOfChange(dateOfChange)
                 .detail(serializedAppointment)
                 .build();

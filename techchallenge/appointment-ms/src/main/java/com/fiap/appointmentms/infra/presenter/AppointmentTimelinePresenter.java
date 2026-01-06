@@ -3,8 +3,7 @@ package com.fiap.appointmentms.infra.presenter;
 import com.fiap.appointmentms.core.domain.AppointmentTimeline;
 import com.fiap.appointmentms.infra.gateway.spring.data.entity.AppointmentTimelineEntity;
 import com.fiap.core.enums.AppointmentEventEnum;
-import com.fiap.core.message.AppointmentRegisterMessage;
-import com.fiap.core.message.AppointmentUpdateMessage;
+import com.fiap.core.message.*;
 
 import java.util.Objects;
 
@@ -32,6 +31,7 @@ public class AppointmentTimelinePresenter {
                 .registeredBy(appointmentTimeline.registeredBy())
                 .event(appointmentTimeline.event())
                 .observation(isNullParam(appointmentTimeline.observation()))
+                .updatedObservations(isNullParam(appointmentTimeline.updatedObservation()))
                 .cancellationReason(isNullParam(appointmentTimeline.cancellationReason()))
                 .correctedObservation(isNullParam(appointmentTimeline.correctedObservation()))
                 .justification(isNullParam(appointmentTimeline.justification()))
@@ -55,5 +55,29 @@ public class AppointmentTimelinePresenter {
 
     private static String isNullParam(String param) {
         return Objects.isNull(param) ? null : param;
+    }
+
+    public static AppointmentTimeline toDomain(AppointmentCorrectionMessage message) {
+        return AppointmentTimeline.builder()
+                .idAppointment(message.idAppointment())
+                .correctedObservation(message.correctedObservation())
+                .justification(message.justification())
+                .event(AppointmentEventEnum.CORRECTED_APPOINTMENT)
+                .build();
+    }
+
+    public static AppointmentTimeline toDomain(AppointmentCompletedMessage message) {
+        return AppointmentTimeline.builder()
+                .idAppointment(message.idAppointment())
+                .event(AppointmentEventEnum.COMPLETED_APPOINTMENT)
+                .build();
+    }
+
+    public static AppointmentTimeline toDomain(AppointmentCancelledMessage message) {
+        return AppointmentTimeline.builder()
+                .idAppointment(message.idAppointment())
+                .cancellationReason(message.cancellationReason())
+                .event(AppointmentEventEnum.CANCELLED_APPOINTMENT)
+                .build();
     }
 }

@@ -22,10 +22,13 @@ public class CorrectionAppointmentUsecase {
     public void execute(AppointmentCorrection correction) {
         var appointment = appointmentGateway.findById(correction.idAppointment());
         if(appointment.isPresent()){
-            var toCorrect = AppointmentPresenter.toDomain(appointment.get(), AppointmentEventEnum.CORRECTED_APPOINTMENT);
-            appointmentGateway.update(toCorrect);
-            var message = AppointmentMessagePresenter.toMessage(correction);
-            appointmentEventSourcingGateway.correctionAppointment(message);
+            var paramAppointment = appointment.get();
+            if(!paramAppointment.event().equals(AppointmentEventEnum.COMPLETED_APPOINTMENT) && !paramAppointment.event().equals(AppointmentEventEnum.CANCELLED_APPOINTMENT)){
+                var toCorrect = AppointmentPresenter.toDomain(paramAppointment, AppointmentEventEnum.CORRECTED_APPOINTMENT);
+                appointmentGateway.update(toCorrect);
+                var message = AppointmentMessagePresenter.toMessage(correction);
+                appointmentEventSourcingGateway.correctionAppointment(message);
+            } else throw new IllegalStateException("Appointment already finished");
         } else throw new IllegalStateException("Appointment not found");
     }
 }
