@@ -6,7 +6,7 @@ import lombok.Builder;
 @Builder
 public record AppointmentUpdate(
         Long idAppointment,
-        String observations,
+        String updatedObservation,
         String cid,
         AppointmentEventEnum event
 ) {

@@ -41,7 +41,12 @@ public class AppointmentConsumerSpringGateway implements AppointmentEventListner
 
     @Override
     public void doOnUpdateAppointment(AppointmentUpdateMessage message) {
+        log.info("Updating appointment: {}", message);
+        AppointmentTimeline appointmentTimelineDomain = AppointmentTimelinePresenter.toDomain(message);
+        appointmentTimelineGateway.save(appointmentTimelineDomain);
 
+        AppointmentView appointmentViewDomain = AppointmentViewPresenter.toDomain(message, LocalDateTime.now());
+        appointmentViewGateway.update(appointmentViewDomain);
     }
 
     @Override

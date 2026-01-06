@@ -24,6 +24,7 @@ public class AppointmentTimelineEntity {
     Long doctor;
     Long registeredBy;
     String observation;
+    String updatedObservations;
     String cancellationReason;
     String correctedObservation;
     String justification;

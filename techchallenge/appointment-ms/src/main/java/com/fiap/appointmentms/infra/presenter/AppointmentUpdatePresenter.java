@@ -14,7 +14,7 @@ public class AppointmentUpdatePresenter {
     public static AppointmentUpdate toUpdateDomain(AppointmentUpdateRequest request) {
         return AppointmentUpdate.builder()
                 .idAppointment(request.idAppointment())
-                .observations(request.observations())
+                .updatedObservation(request.observations())
                 .cid(request.cid())
                 .event(AppointmentEventEnum.UPDATED_APPOINTMENT)
                 .build();
@@ -23,7 +23,7 @@ public class AppointmentUpdatePresenter {
     public static AppointmentUpdateMessage toMessage(Appointment appointment, AppointmentUpdate update) {
         return AppointmentUpdateMessage.builder()
                 .idAppointment(appointment.id())
-                .observations(appointment.observation())
+                .updatedObservation(appointment.observation())
                 .cid(update.cid())
                 .build();
     }

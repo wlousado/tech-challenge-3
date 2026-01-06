@@ -13,6 +13,7 @@ public record AppointmentTimeline(
         Long doctor,
         Long registeredBy,
         String observation,
+        String updatedObservation,
         String cancellationReason,
         String correctedObservation,
         String justification,

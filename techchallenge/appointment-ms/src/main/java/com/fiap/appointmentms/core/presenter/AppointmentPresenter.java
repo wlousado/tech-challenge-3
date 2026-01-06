@@ -27,7 +27,7 @@ public class AppointmentPresenter {
                 .doctor(appointment.doctor())
                 .registeredBy(appointment.registeredBy())
                 .patient(appointment.patient())
-                .observation(updateAppointment.observations())
+                .observation(updateAppointment.updatedObservation())
                 .dateTimeOfAppointment(appointment.dateTimeOfAppointment())
                 .event(updateAppointment.event())
                 .build();

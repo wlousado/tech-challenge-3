@@ -4,6 +4,7 @@ import com.fiap.appointmentms.core.domain.AppointmentTimeline;
 import com.fiap.appointmentms.infra.gateway.spring.data.entity.AppointmentTimelineEntity;
 import com.fiap.core.enums.AppointmentEventEnum;
 import com.fiap.core.message.AppointmentRegisterMessage;
+import com.fiap.core.message.AppointmentUpdateMessage;
 
 import java.util.Objects;
 
@@ -37,6 +38,14 @@ public class AppointmentTimelinePresenter {
                 .cid(isNullParam(appointmentTimeline.cid()))
                 .dateTimeOfAppointment(Objects.isNull(appointmentTimeline.dateTimeOfAppointment()) ? null : appointmentTimeline.dateTimeOfAppointment())
                 .updatedAt(appointmentTimeline.updatedAt())
+                .build();
+    }
+
+    public static AppointmentTimeline toDomain(AppointmentUpdateMessage message) {
+        return AppointmentTimeline.builder()
+                .idAppointment(message.idAppointment())
+                .updatedObservation(message.updatedObservation())
+                .event(AppointmentEventEnum.UPDATED_APPOINTMENT)
                 .build();
     }
 

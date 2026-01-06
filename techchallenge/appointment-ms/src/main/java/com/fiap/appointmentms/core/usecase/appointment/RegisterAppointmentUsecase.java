@@ -14,13 +14,13 @@ import java.time.LocalDateTime;
 
 @Service
 @Slf4j
-public class BookAppointmentUsecase {
+public class RegisterAppointmentUsecase {
 
     private final AppointmentGateway appointmentGateway;
     private final UserGateway userGateway;
     private final AppointmentEventSourcingGateway appointmentEventSourcingGateway;
 
-    public BookAppointmentUsecase(AppointmentGateway appointmentGateway, UserGateway userGateway, AppointmentEventSourcingGateway appointmentEventSourcingGateway) {
+    public RegisterAppointmentUsecase(AppointmentGateway appointmentGateway, UserGateway userGateway, AppointmentEventSourcingGateway appointmentEventSourcingGateway) {
         this.appointmentGateway = appointmentGateway;
         this.userGateway = userGateway;
         this.appointmentEventSourcingGateway = appointmentEventSourcingGateway;

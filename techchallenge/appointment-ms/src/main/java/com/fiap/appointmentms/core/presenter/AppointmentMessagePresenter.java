@@ -24,7 +24,7 @@ public class AppointmentMessagePresenter {
     public static AppointmentUpdateMessage toMessage(AppointmentUpdate updateAppointment) {
         return AppointmentUpdateMessage.builder()
                 .idAppointment(updateAppointment.idAppointment())
-                .observations(updateAppointment.observations())
+                .updatedObservation(updateAppointment.updatedObservation())
                 .cid(updateAppointment.cid())
                 .build();
     }

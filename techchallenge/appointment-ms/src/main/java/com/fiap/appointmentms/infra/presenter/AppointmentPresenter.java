@@ -1,13 +1,11 @@
 package com.fiap.appointmentms.infra.presenter;
 
 import com.fiap.appointmentms.core.domain.Appointment;
-import com.fiap.appointmentms.core.domain.User;
 import com.fiap.appointmentms.infra.controller.appointment.request.AppointmentCreateRequest;
 import com.fiap.appointmentms.infra.gateway.spring.data.entity.AppointmentEntity;
 import com.fiap.core.enums.AppointmentEventEnum;
 import com.fiap.core.message.AppointmentUpdateMessage;
 import com.fiap.core.message.AppointmentRegisterMessage;
-import jakarta.validation.Valid;
 
 import java.security.Principal;
 import java.util.Objects;
@@ -63,7 +61,7 @@ public class AppointmentPresenter {
     public static Appointment toDomain(AppointmentUpdateMessage message) {
         return Appointment.builder()
                 .id(message.idAppointment())
-                .observation(message.observations())
+                .observation(message.updatedObservation())
                 .build();
     }
 
