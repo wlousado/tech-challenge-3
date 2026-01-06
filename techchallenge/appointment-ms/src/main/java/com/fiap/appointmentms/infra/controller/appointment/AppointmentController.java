@@ -38,6 +38,7 @@ public class AppointmentController {
         this.completedAppoiintmentUsecase = completedAppoiintmentUsecase;
     }
 
+
     @PostMapping
     public void create(@RequestBody @Valid AppointmentCreateRequest request, Principal principal){
         Appointment appointmentToCreate = AppointmentPresenter.toDomain(request, principal);

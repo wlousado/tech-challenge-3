@@ -1,12 +1,11 @@
 package com.fiap.appointmentms.core.presenter;
 
 import com.fiap.appointmentms.core.domain.Appointment;
+import com.fiap.appointmentms.core.domain.AppointmentCancelled;
 import com.fiap.appointmentms.core.domain.AppointmentCorrection;
 import com.fiap.appointmentms.core.domain.AppointmentUpdate;
 import com.fiap.appointmentms.infra.presenter.UserPresenter;
-import com.fiap.core.message.AppointmentCorrectionMessage;
-import com.fiap.core.message.AppointmentRegisterMessage;
-import com.fiap.core.message.AppointmentUpdateMessage;
+import com.fiap.core.message.*;
 
 public class AppointmentMessagePresenter {
 
@@ -36,6 +35,19 @@ public class AppointmentMessagePresenter {
                 .idAppointment(correction.idAppointment())
                 .correctedObservation(correction.correctedObservation())
                 .justification(correction.justification())
+                .build();
+    }
+
+    public static AppointmentCancelledMessage toMessage(AppointmentCancelled appointmentCancelled) {
+        return AppointmentCancelledMessage.builder()
+                .idAppointment(appointmentCancelled.idAppointment())
+                .cancellationReason(appointmentCancelled.cancellationReason())
+                .build();
+    }
+
+    public static AppointmentCompletedMessage toMessage(Long idAppointment) {
+        return AppointmentCompletedMessage.builder()
+                .idAppointment(idAppointment)
                 .build();
     }
 }
