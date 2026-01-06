@@ -17,10 +17,6 @@ public record User(
         LocalDateTime updatedAt) {
 
 
-    public User(Long id) {
-        this(id, null, null, null, null, null, null, null);
-    }
-
     public User(String username, String password, String authority) {
         this(null, username, username, username, password, UserTypeEnum.valueOf(authority), null, null);
     }

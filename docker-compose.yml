@@ -77,6 +77,16 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+  appointment-db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: toor
+      MYSQL_DATABASE: appointmentdb
+      MYSQL_USER: appointment
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
   kong-migration:
     image: kong:3.7
     container_name: kong-migration

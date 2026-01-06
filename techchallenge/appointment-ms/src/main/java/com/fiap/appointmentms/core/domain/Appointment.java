@@ -1,5 +1,6 @@
 package com.fiap.appointmentms.core.domain;
 
+import com.fiap.core.enums.AppointmentEventEnum;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ public record Appointment(
         User patient,
         User doctor,
         User registeredBy,
+        AppointmentEventEnum event,
         String observation,
         LocalDateTime dateTimeOfAppointment
         ) {

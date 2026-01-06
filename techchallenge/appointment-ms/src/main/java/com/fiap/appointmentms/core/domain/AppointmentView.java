@@ -6,11 +6,10 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 
 @Builder
-public record AppointmentHistory (
+public record AppointmentView(
         Long id,
         Long idAppointment,
-        LocalDateTime dateTimeOfChange,
         AppointmentEventEnum event,
-        String detail
+        LocalDateTime updatedAt
 ) {
 }

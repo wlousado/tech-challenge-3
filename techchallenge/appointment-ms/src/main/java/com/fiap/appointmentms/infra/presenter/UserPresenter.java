@@ -18,16 +18,16 @@ public class UserPresenter {
     }
 
     public static User mapEntity(UserEntity userEntity) {
-        return new User(
-                userEntity.getId(),
-                userEntity.getName(),
-                userEntity.getEmail(),
-                userEntity.getLogin(),
-                userEntity.getPassword(),
-                userEntity.getUserType(),
-                userEntity.getCreatedAt(),
-                userEntity.getUpdatedAt()
-        );
+        return User.builder()
+                .id(userEntity.getId())
+                .name(userEntity.getName())
+                .email(userEntity.getEmail())
+                .login(userEntity.getLogin())
+                .password(userEntity.getPassword())
+                .type(userEntity.getUserType())
+                .createdAt(userEntity.getCreatedAt())
+                .updatedAt(userEntity.getUpdatedAt())
+                .build();
     }
 
     public static UserEntity toEntity(User user) {
@@ -44,7 +44,12 @@ public class UserPresenter {
     }
 
     public static UserMessage toMessage(User user) {
-        return new UserMessage(user.id(), user.name(), user.email(), user.type());
+        return UserMessage.builder()
+                .id(user.id())
+                .name(user.name())
+                .email(user.email())
+                .type(user.type())
+                .build();
     }
 
     public static User toDomain(UserMessage doctor) {
@@ -53,6 +58,18 @@ public class UserPresenter {
                 .name(doctor.name())
                 .email(doctor.email())
                 .type(doctor.type())
+                .build();
+    }
+
+    public static User toDomain(Long idUser) {
+        return User.builder()
+                .id(idUser)
+                .build();
+    }
+
+    public static User toDomain(String username) {
+        return User.builder()
+                .login(username)
                 .build();
     }
 }

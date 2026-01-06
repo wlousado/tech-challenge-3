@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -32,15 +34,6 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     private UserTypeEnum userType;
 
-    public UserEntity(User doc) {
-        if(!Objects.isNull(doc.id()))
-            this.id = doc.id();
-        this.name = doc.name();
-        this.email = doc.email();
-        this.login = doc.login();
-        this.password = doc.password();
-        this.userType = doc.type();
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
+    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AppointmentEntity> appointments = new ArrayList<>();
 }

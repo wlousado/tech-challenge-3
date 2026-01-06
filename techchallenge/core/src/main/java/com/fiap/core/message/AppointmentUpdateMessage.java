@@ -1,6 +1,9 @@
 package com.fiap.core.message;
 
-public record UpdateAppointmentMessage(
+import lombok.Builder;
+
+@Builder
+public record AppointmentUpdateMessage(
         Long idAppointment,
         String observations,
         String cid
