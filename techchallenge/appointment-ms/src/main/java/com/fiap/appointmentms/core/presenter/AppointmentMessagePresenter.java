@@ -1,8 +1,10 @@
 package com.fiap.appointmentms.core.presenter;
 
 import com.fiap.appointmentms.core.domain.Appointment;
+import com.fiap.appointmentms.core.domain.AppointmentCorrection;
 import com.fiap.appointmentms.core.domain.AppointmentUpdate;
 import com.fiap.appointmentms.infra.presenter.UserPresenter;
+import com.fiap.core.message.AppointmentCorrectionMessage;
 import com.fiap.core.message.AppointmentRegisterMessage;
 import com.fiap.core.message.AppointmentUpdateMessage;
 
@@ -26,6 +28,14 @@ public class AppointmentMessagePresenter {
                 .idAppointment(updateAppointment.idAppointment())
                 .updatedObservation(updateAppointment.updatedObservation())
                 .cid(updateAppointment.cid())
+                .build();
+    }
+
+    public static AppointmentCorrectionMessage toMessage(AppointmentCorrection correction) {
+        return AppointmentCorrectionMessage.builder()
+                .idAppointment(correction.idAppointment())
+                .correctedObservation(correction.correctedObservation())
+                .justification(correction.justification())
                 .build();
     }
 }

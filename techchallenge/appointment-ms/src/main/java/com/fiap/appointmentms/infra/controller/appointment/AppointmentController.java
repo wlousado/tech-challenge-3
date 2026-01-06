@@ -1,11 +1,16 @@
 package com.fiap.appointmentms.infra.controller.appointment;
 
 import com.fiap.appointmentms.core.domain.Appointment;
+import com.fiap.appointmentms.core.domain.AppointmentCancelled;
+import com.fiap.appointmentms.core.domain.AppointmentCorrection;
 import com.fiap.appointmentms.core.domain.AppointmentUpdate;
-import com.fiap.appointmentms.core.usecase.appointment.RegisterAppointmentUsecase;
-import com.fiap.appointmentms.core.usecase.appointment.UpdateAppointmentUsecase;
+import com.fiap.appointmentms.core.usecase.appointment.*;
+import com.fiap.appointmentms.infra.controller.appointment.request.AppointmentCancelRequest;
+import com.fiap.appointmentms.infra.controller.appointment.request.AppointmentCorrectionRequest;
 import com.fiap.appointmentms.infra.controller.appointment.request.AppointmentCreateRequest;
 import com.fiap.appointmentms.infra.controller.appointment.request.AppointmentUpdateRequest;
+import com.fiap.appointmentms.infra.presenter.AppointmentCancelledPresenter;
+import com.fiap.appointmentms.infra.presenter.AppointmentCorrectionPresenter;
 import com.fiap.appointmentms.infra.presenter.AppointmentPresenter;
 import com.fiap.appointmentms.infra.presenter.AppointmentUpdatePresenter;
 import jakarta.validation.Valid;
@@ -21,10 +26,16 @@ public class AppointmentController {
 
     private final RegisterAppointmentUsecase bookAppointmentUsecase;
     private final UpdateAppointmentUsecase updateAppointmentUsecase;
+    private final CorrectionAppointmentUsecase correctionAppointmentUsecase;
+    private final CancelledAppointmentUsecase cancelledAppointmentUsecase;
+    private final CompletedAppoiintmentUsecase completedAppoiintmentUsecase;
 
-    public AppointmentController(RegisterAppointmentUsecase bookAppointmentUsecase, UpdateAppointmentUsecase updateAppointmentUsecase) {
+    public AppointmentController(RegisterAppointmentUsecase bookAppointmentUsecase, UpdateAppointmentUsecase updateAppointmentUsecase, CorrectionAppointmentUsecase correctionAppointmentUsecase, CancelledAppointmentUsecase cancelledAppointmentUsecase, CompletedAppoiintmentUsecase completedAppoiintmentUsecase) {
         this.bookAppointmentUsecase = bookAppointmentUsecase;
         this.updateAppointmentUsecase = updateAppointmentUsecase;
+        this.correctionAppointmentUsecase = correctionAppointmentUsecase;
+        this.cancelledAppointmentUsecase = cancelledAppointmentUsecase;
+        this.completedAppoiintmentUsecase = completedAppoiintmentUsecase;
     }
 
     @PostMapping
@@ -40,18 +51,19 @@ public class AppointmentController {
     }
 
     @PatchMapping("/correction")
-    public void correction(){
-
+    public void correction(@RequestBody @Valid AppointmentCorrectionRequest request){
+        AppointmentCorrection correction = AppointmentCorrectionPresenter.toDomain(request);
+        correctionAppointmentUsecase.execute(correction);
     }
 
     @PatchMapping("/cancel")
-    public void cancel(){
-
+    public void cancel(@RequestBody @Valid AppointmentCancelRequest request){
+        AppointmentCancelled cancelled = AppointmentCancelledPresenter.toDomain(request);
+        cancelledAppointmentUsecase.execute(cancelled);
     }
 
-
-    @PatchMapping("/complete")
-    public void complete(){
-
+    @PatchMapping("/complete/{idAppointment}")
+    public void complete(@PathVariable Long idAppointment){
+        completedAppoiintmentUsecase.execute(idAppointment);
     }
 }
