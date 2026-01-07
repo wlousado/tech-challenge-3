@@ -19,7 +19,7 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username:  fiaptech26@gmail.com
+    username: fiaptech26@gmail.com
     password: tdyd asep pgvx obqo
     properties:
       mail:
