@@ -8,12 +8,12 @@ import com.fiap.core.enums.AppointmentEventEnum;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CompletedAppoiintmentUsecase {
+public class CompletedAppointmentUsecase {
 
     private final AppointmentGateway appointmentGateway;
     private final AppointmentEventSourcingGateway appointmentEventSourcingGateway;
 
-    public CompletedAppoiintmentUsecase(AppointmentGateway appointmentGateway, AppointmentEventSourcingGateway appointmentEventSourcingGateway) {
+    public CompletedAppointmentUsecase(AppointmentGateway appointmentGateway, AppointmentEventSourcingGateway appointmentEventSourcingGateway) {
         this.appointmentGateway = appointmentGateway;
         this.appointmentEventSourcingGateway = appointmentEventSourcingGateway;
     }

@@ -28,14 +28,14 @@ public class AppointmentController {
     private final UpdateAppointmentUsecase updateAppointmentUsecase;
     private final CorrectionAppointmentUsecase correctionAppointmentUsecase;
     private final CancelledAppointmentUsecase cancelledAppointmentUsecase;
-    private final CompletedAppoiintmentUsecase completedAppoiintmentUsecase;
+    private final CompletedAppointmentUsecase completedAppointmentUsecase;
 
-    public AppointmentController(RegisterAppointmentUsecase bookAppointmentUsecase, UpdateAppointmentUsecase updateAppointmentUsecase, CorrectionAppointmentUsecase correctionAppointmentUsecase, CancelledAppointmentUsecase cancelledAppointmentUsecase, CompletedAppoiintmentUsecase completedAppoiintmentUsecase) {
+    public AppointmentController(RegisterAppointmentUsecase bookAppointmentUsecase, UpdateAppointmentUsecase updateAppointmentUsecase, CorrectionAppointmentUsecase correctionAppointmentUsecase, CancelledAppointmentUsecase cancelledAppointmentUsecase, CompletedAppointmentUsecase completedAppointmentUsecase) {
         this.bookAppointmentUsecase = bookAppointmentUsecase;
         this.updateAppointmentUsecase = updateAppointmentUsecase;
         this.correctionAppointmentUsecase = correctionAppointmentUsecase;
         this.cancelledAppointmentUsecase = cancelledAppointmentUsecase;
-        this.completedAppoiintmentUsecase = completedAppoiintmentUsecase;
+        this.completedAppointmentUsecase = completedAppointmentUsecase;
     }
 
 
@@ -65,6 +65,6 @@ public class AppointmentController {
 
     @PatchMapping("/complete/{idAppointment}")
     public void complete(@PathVariable Long idAppointment){
-        completedAppoiintmentUsecase.execute(idAppointment);
+        completedAppointmentUsecase.execute(idAppointment);
     }
 }
