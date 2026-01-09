@@ -24,4 +24,4 @@ USER app_user
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java","-Dspring.profiles.active=docker", "-jar", "app.jar"]

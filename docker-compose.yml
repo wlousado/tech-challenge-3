@@ -80,6 +80,7 @@ services:
       timeout: 5s
       retries: 5
   appointment-db:
+    container_name: appointment-db
     image: mysql:8.0
     restart: always
     environment:

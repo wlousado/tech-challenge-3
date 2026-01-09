@@ -14,7 +14,7 @@ VALUES ('Joe Nurse',
 
 INSERT INTO user_appointment(NAME, EMAIL, LOGIN, PASSWORD, USER_TYPE)
 VALUES ('Joe Patient',
-        'patient@appointmentms.com',
+        'agendamentoTech@outlook.com',
         'patient',
         '$2a$10$dwwp0e5zwZeDN4SsCREYIe06b.6p/FHJHvd4l01p.kfYVGxYq7u6G',
         'PATIENT');
