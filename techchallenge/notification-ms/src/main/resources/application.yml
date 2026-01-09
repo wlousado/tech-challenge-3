@@ -19,8 +19,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: #criar novo email
-    password: #gerar nova senha de aplicativo
+    username: fiaptech26@gmail.com
+    password: tdyd asep pgvx obqo
     properties:
       mail:
         smtp:
