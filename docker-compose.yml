@@ -18,26 +18,39 @@ services:
       start_period: 30s
     ports:
     - 9092:9092
+    - 29092:29092
     environment:
       KAFKA_NODE_ID: 1
-      KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:29093'
+      KAFKA_LISTENERS: 'PLAINTEXT://0.0.0.0:29092,CONTROLLER://0.0.0.0:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
     volumes:
       - ./kafka-data:/var/lib/kafka/data
-
   kafka-create-topics:
     image: apache/kafka:4.1.1
     container_name: init-kafka-topics
     depends_on:
       kafka:
         condition: service_healthy
-    command: /opt/kafka/bin/kafka-topics.sh --create --topic meu-topico-1 --partitions 3 --bootstrap-server kafka:9092
+    command: /opt/kafka/bin/kafka-topics.sh --create --topic appointments-events --partitions 3 --bootstrap-server kafka:29092
     restart: no
-
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "9091:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:29092
+    depends_on:
+      - kafka
   # Banco de dados
   postgres:
     image: postgres:15-alpine
@@ -55,8 +68,18 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
-  # Migração do banco (roda 1 vez e para)
+  appointment-db:
+    image: mysql:8.0
+    restart: always
+    networks:
+      - kong-net
+    environment:
+      MYSQL_ROOT_PASSWORD: toor
+      MYSQL_DATABASE: appointmentdb
+      MYSQL_USER: appointment
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
   kong-migration:
     image: kong:3.7
     container_name: kong-migration
@@ -73,8 +96,6 @@ services:
       KONG_PG_DATABASE: kong
     command: kong migrations bootstrap
     restart: on-failure
-
-  # Kong Gateway
   kong:
     image: kong:3.7
     container_name: kong
@@ -95,39 +116,31 @@ services:
       KONG_ADMIN_ERROR_LOG: /dev/stderr
       KONG_ADMIN_LISTEN: 0.0.0.0:8001
     ports:
-      - "8000:8000"  # Proxy HTTP
-      - "8001:8001"  # Admin API
-      - "8002:8002"  # Admin GUI
+      - "8000:8000"
+      - "8001:8001"
+      - "8002:8002"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
       timeout: 5s
       retries: 5
-
-  # Microserviço de Agendamento
-  scheduling-ms:
+  appointment-ms:
     build:
       dockerfile: Dockerfile
       args:
-        SERVICE: scheduling-ms
-    container_name: scheduling-ms
+        SERVICE: appointment-ms
+    container_name: appointment-ms
     networks:
       - kong-net
     ports:
       - "3001:8080"
-    #  - "3001-3002:8080"
     restart: unless-stopped
-    #deploy:
-    #  mode: replicated
-    #  replicas: 2
     depends_on:
       kafka:
         condition: service_healthy
       postgres:
         condition: service_healthy
-
-  # Microserviço de Notificação
   notification-ms:
     build:
       dockerfile: Dockerfile
