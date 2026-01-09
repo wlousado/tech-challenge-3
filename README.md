@@ -75,6 +75,7 @@ Aguarde ~30 segundos para todos os serviços iniciarem.
 - **[AUTHENTICATION_GUIDE.md](AUTHENTICATION_GUIDE.md)** - Guia completo de autenticação com exemplos de código
 - **[KONG_SETUP_GUIDE.md](KONG_SETUP_GUIDE.md)** - Configuração avançada do Kong
 - **[kong-auth-acl-setup.sh](techchallenge/kong-auth-acl-setup.sh)** - Script de configuração automática
+- **[Swagger](https://app.swaggerhub.com/apis/bra-635/tech-challenge-3-pos-tech-fiap/1.0.0)** - Documentação API e Contratos
 
 ## 💻 Exemplos de Uso
 
