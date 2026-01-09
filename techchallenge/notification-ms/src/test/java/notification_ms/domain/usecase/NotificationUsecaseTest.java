@@ -1,7 +1,8 @@
 package notification_ms.domain.usecase;
 
-import com.fiap.core.dto.ConsultaDto;
-import com.fiap.core.dto.UsuarioDto;
+import com.fiap.core.enums.UserTypeEnum;
+import com.fiap.core.message.AppointmentMessage;
+import com.fiap.core.message.UserMessage;
 import com.fiap.notificationms.domain.usecase.NotificationUsecase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,16 +29,16 @@ class NotificationUsecaseTest {
     @InjectMocks
     private NotificationUsecase notificationUsecase;
 
-    private ConsultaDto consultaDto;
+    private AppointmentMessage consultaDto;
     private final String EMAIL_FROM = "noreply@notification.com";
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(notificationUsecase, "emailFrom", EMAIL_FROM);
 
-        UsuarioDto paciente = new UsuarioDto("Maria", "Souza", "maria@email.com", "PACIENTE");
-        UsuarioDto medico = new UsuarioDto("Dr. Strange", "Stephen", "strange@email.com", "MEDICO");
-        consultaDto = new ConsultaDto("Consulta oftalmológica", paciente, medico, "2023-11-15T14:30:00");
+        UserMessage paciente = new UserMessage(125L, "Maria", "maria@email.com", UserTypeEnum.PATIENT);
+        UserMessage medico = new UserMessage(126L, "Dr. Strange", "strange@email.com", UserTypeEnum.DOCTOR);
+        consultaDto = new AppointmentMessage("Consulta oftalmológica", paciente, medico, "2023-11-15T14:30:00");
     }
 
     @Test
@@ -57,13 +58,12 @@ class NotificationUsecaseTest {
                         "Sua consulta foi agendada com sucesso." +
                         "Detalhes da consulta:" +
                         "Descrição: %s" +
-                        "Médico: %s %s" +
+                        "Médico: %s" +
                         "Data: %s" +
                         "Atenciosamente, Equipe de Atendimento",
-                consultaDto.paciente().nome(),
+                consultaDto.paciente().name(),
                 consultaDto.descricao(),
-                consultaDto.medico().nome(),
-                consultaDto.medico().sobrenome(),
+                consultaDto.medico().name(),
                 consultaDto.data()
         );
         assertEquals(expectedBody, sentMessage.getText());
