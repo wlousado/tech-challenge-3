@@ -1,0 +1,263 @@
+openapi: 3.0.3
+
+info:
+  title: Tech Challenge - Hospital Appointment API
+  description: API responsavel pelo agendamento de consultas medicas e autenticacao de usuarios.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3001
+    description: Ambiente local
+
+tags:
+  - name: Authentication
+    description: Endpoints de autenticacao e geracao de token JWT
+  - name: Appointments
+    description: Gestao do ciclo de vida das consultas medicas
+  - name: History
+    description: Consultas ao historico medico via GraphQL
+
+paths:
+
+  /v1/auth:
+    post:
+      tags:
+        - Authentication
+      summary: Login do usuario
+      description: Realiza login do usuario e retorna token JWT para autenticacao.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        '200':
+          description: Autenticacao realizada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Credenciais invalidas
+
+  /v1/appointment:
+    post:
+      tags:
+        - Appointments
+      summary: Criar consulta medica
+      description: Cria uma nova consulta medica. Acesso restrito a medicos e enfermeiros.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentRequest'
+      responses:
+        '201':
+          description: Consulta criada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponse'
+        '403':
+          description: Acesso negado
+
+  /v1/appointment/update:
+    patch:
+      tags:
+        - Appointments
+      summary: Atualizar consulta medica
+      description: Atualiza dados de uma consulta medica existente.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentUpdateRequest'
+      responses:
+        '200':
+          description: Consulta atualizada com sucesso
+
+  /v1/appointment/correction:
+    patch:
+      tags:
+        - Appointments
+      summary: Corrigir consulta medica
+      description: Corrige informacoes pontuais de uma consulta medica.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentCorrectionRequest'
+      responses:
+        '200':
+          description: Consulta corrigida com sucesso
+
+  /v1/appointment/cancel:
+    patch:
+      tags:
+        - Appointments
+      summary: Cancelar consulta medica
+      description: Cancela uma consulta medica existente.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentCancelRequest'
+      responses:
+        '200':
+          description: Consulta cancelada com sucesso
+
+  /v1/appointment/complete/{idAppointment}:
+    patch:
+      tags:
+        - Appointments
+      summary: Concluir consulta medica
+      description: Marca uma consulta medica como concluida e registra no historico do paciente.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: idAppointment
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Consulta concluida com sucesso
+
+  /graphql:
+    post:
+      tags:
+        - History
+      summary: Consultar historico medico
+      description: Endpoint GraphQL para consultas flexiveis ao historico medico dos pacientes.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  example: "{ appointments { id status dateTime } }"
+      responses:
+        '200':
+          description: Consulta GraphQL executada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    AuthRequest:
+      type: object
+      required:
+        - login
+        - password
+      properties:
+        login:
+          type: string
+          example: medico01
+        password:
+          type: string
+          example: senha123
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+    AppointmentRequest:
+      type: object
+      required:
+        - patientId
+        - professionalId
+        - dateTime
+      properties:
+        patientId:
+          type: string
+          example: "123"
+        professionalId:
+          type: string
+          example: "456"
+        dateTime:
+          type: string
+          format: date-time
+          example: "2026-02-10T14:00:00"
+        notes:
+          type: string
+          example: Consulta de rotina
+
+    AppointmentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "789"
+        status:
+          type: string
+          example: SCHEDULED
+
+    AppointmentUpdateRequest:
+      type: object
+      required:
+        - appointmentId
+      properties:
+        appointmentId:
+          type: string
+          example: "789"
+        dateTime:
+          type: string
+          format: date-time
+        notes:
+          type: string
+
+    AppointmentCorrectionRequest:
+      type: object
+      required:
+        - appointmentId
+      properties:
+        appointmentId:
+          type: string
+          example: "789"
+        correctionReason:
+          type: string
+          example: Ajuste de horario solicitado pelo paciente
+
+    AppointmentCancelRequest:
+      type: object
+      required:
+        - appointmentId
+      properties:
+        appointmentId:
+          type: string
+          example: "789"
+        reason:
+          type: string
+          example: Paciente indisponivel
