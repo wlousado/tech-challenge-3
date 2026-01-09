@@ -2,6 +2,8 @@ package com.fiap.appointmentms.core.stub;
 
 import com.fiap.appointmentms.core.domain.Appointment;
 import com.fiap.appointmentms.core.domain.User;
+import com.fiap.appointmentms.infra.gateway.spring.data.entity.AppointmentEntity;
+import com.fiap.appointmentms.infra.gateway.spring.data.entity.UserEntity;
 import com.fiap.core.enums.AppointmentEventEnum;
 
 import java.time.LocalDateTime;
@@ -41,6 +43,17 @@ public class AppointmentStub {
                 .patient(UserStub.createPatient())
                 .dateTimeOfAppointment(LocalDateTime.now().plusDays(1))
                 .event(event)
+                .build();
+    }
+
+    public static AppointmentEntity createEntity() {
+        return AppointmentEntity.builder()
+                .id(1L)
+                .doctor(UserStub.createEntityDoctor())
+                .registeredBy(UserStub.createEntityNurse())
+                .patient(UserStub.createEntityPatient())
+                .dateOfAppointment(LocalDateTime.now().plusDays(1))
+                .event(AppointmentEventEnum.REGISTERED_APPOINTMENT)
                 .build();
     }
 }

@@ -1,6 +1,7 @@
 package com.fiap.appointmentms.core.stub;
 
 import com.fiap.appointmentms.core.domain.User;
+import com.fiap.appointmentms.infra.gateway.spring.data.entity.UserEntity;
 import com.fiap.core.enums.UserTypeEnum;
 
 public class UserStub {
@@ -30,4 +31,27 @@ public class UserStub {
     }
 
 
+    public static UserEntity createEntityDoctor() {
+        return UserEntity.builder()
+                .id(1L)
+                .login("doctor")
+                .password("pass123")
+                .userType(UserTypeEnum.DOCTOR)
+                .build();
+    }
+
+    public static UserEntity createEntityNurse() {
+        return UserEntity.builder()
+                .id(2L)
+                .login("nurse")
+                .userType(UserTypeEnum.NURSE)
+                .build();
+    }
+
+    public static UserEntity createEntityPatient() {
+        return UserEntity.builder()
+                .id(3L)
+                .userType(UserTypeEnum.PATIENT)
+                .build();
+    }
 }

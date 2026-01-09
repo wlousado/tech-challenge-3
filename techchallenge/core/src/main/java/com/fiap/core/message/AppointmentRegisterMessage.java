@@ -13,7 +13,4 @@ public record AppointmentRegisterMessage(
         LocalDateTime dateTimeOfAppointment
 ) {
 
-    public AppointmentRegisterMessage addIdAppointment(Long id){
-        return new AppointmentRegisterMessage(id, this.patient, this.doctor, this.registeredBy, this.dateTimeOfAppointment);
-    }
 }
