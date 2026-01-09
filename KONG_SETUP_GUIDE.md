@@ -15,8 +15,7 @@ Este projeto utiliza Kong API Gateway para gerenciar o acesso aos microserviços
 ┌─────────────────────────────────────┐
 │      Kong API Gateway               │
 │  - Roteamento                       │
-│  - Autenticação (Key Auth)          │
-│  - Controle de Acesso (ACL)         │
+│  - Autenticação (Bearer Auth)       │
 └──────┬──────────────────────┬───────┘
        │                      │
        ▼                      ▼
@@ -45,23 +44,14 @@ Este projeto utiliza Kong API Gateway para gerenciar o acesso aos microserviços
 ## Configuração Atual
 
 ### Services
-| Nome | Host | Port | Path |
-|------|------|------|------|
-| scheduling-service | scheduling-ms | 8080 | / |
+| Nome                 | Host | Port | Path |
+|----------------------|------|------|------|
+| appointment-service  | appointment-ms | 8080 | / |
 | notification-service | notification-ms | 8080 | / |
 
-### Routes
-| Nome | Path | Strip Path | Service |
-|------|------|------------|---------|
-| scheduling-route | /scheduling | false | scheduling-service |
-| notification-route | /notification | false | notification-service |
+ 
 
-### Controle de Acesso (ACL)
 
-| Role | /scheduling | /notification |
-|------|-------------|---------------|
-| **médico** | ✅ Permitido | ✅ Permitido |
-| **paciente** | ❌ Bloqueado | ✅ Permitido |
 
 ## Configurando o Projeto
 
@@ -244,7 +234,6 @@ docker compose down -v
 
 Para informações detalhadas sobre autenticação, exemplos de código e gerenciamento avançado, consulte:
 
-- **[AUTHENTICATION_GUIDE.md](AUTHENTICATION_GUIDE.md)** - Guia completo de autenticação com ACL
 - **[README.md](README.md)** - Guia rápido do projeto
 
 ## Referências

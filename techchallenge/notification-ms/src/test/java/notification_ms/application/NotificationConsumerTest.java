@@ -1,7 +1,8 @@
 package notification_ms.application;
 
-import com.fiap.core.dto.ConsultaDto;
-import com.fiap.core.dto.UsuarioDto;
+import com.fiap.core.enums.UserTypeEnum;
+import com.fiap.core.message.AppointmentMessage;
+import com.fiap.core.message.UserMessage;
 import com.fiap.notificationms.application.NotificationConsumer;
 import com.fiap.notificationms.domain.usecase.NotificationUsecase;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,13 +27,13 @@ class NotificationConsumerTest {
     @InjectMocks
     private NotificationConsumer notificationConsumer;
 
-    private ConsultaDto consultaDto;
+    private AppointmentMessage consultaDto;
 
     @BeforeEach
     void setUp() {
-        UsuarioDto paciente = new UsuarioDto("João", "Silva", "joao@email.com", "PACIENTE");
-        UsuarioDto medico = new UsuarioDto("Dr. House", "Gregory", "house@email.com", "MEDICO");
-        consultaDto = new ConsultaDto("Consulta de rotina", paciente, medico, "2023-10-10T10:00:00");
+        UserMessage paciente = new UserMessage(123L,"João", "joao@email.com", UserTypeEnum.PATIENT);
+        UserMessage medico = new UserMessage(124L, "Dr. House", "house@email.com", UserTypeEnum.DOCTOR);
+        consultaDto = new AppointmentMessage("Consulta de rotina", paciente, medico, "2023-10-10T10:00:00");
     }
 
     @Test

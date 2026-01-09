@@ -12,21 +12,9 @@ docker compose up -d
 
 Aguarde ~30 segundos para todos os serviços iniciarem.
 
-### 2. Configurar Autenticação
-
-```bash
-./kong-auth-acl-setup.sh
-```
 
 ### 3. Testar
 
-```bash
-# Médico acessando scheduling
-curl -H "apikey: medico-drjoao-key-123" http://localhost:8000/scheduling
-
-# Paciente tentando acessar scheduling (será bloqueado)
-curl -H "apikey: paciente-maria-key-789" http://localhost:8000/scheduling
-```
 
 ## 📋 Arquitetura
 
@@ -42,7 +30,7 @@ curl -H "apikey: paciente-maria-key-789" http://localhost:8000/scheduling
 │  ┌──────────────────────────────────────────┐  │
 │  │  Plugins:                                │  │
 │  │  - Key Auth (autenticação)               │  │
-│  │  - ACL (controle de acesso por role)     │  │
+│  |                                          │  │
 │  └──────────────────────────────────────────┘  │
 └────────────┬───────────────────┬───────────────┘
              │                   │
